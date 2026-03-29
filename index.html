@@ -3,52 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Shadow Legend V21 - Pro Edit</title>
+    <title>Dr. Dark: Shadow Legend V21</title>
     <style>
-        body { margin: 0; background: #020205; overflow: hidden; touch-action: none; font-family: 'Segoe UI', sans-serif; }
+        body { margin: 0; background: #050505; overflow: hidden; touch-action: none; font-family: 'Times New Roman', serif; }
         canvas { display: block; width: 100vw; height: 100vh; }
         
-        /* Premium UI */
-        .ui-layer { position: absolute; top: 25px; width: 100%; display: flex; justify-content: space-between; padding: 0 30px; box-sizing: border-box; pointer-events: none; }
-        .health-box { width: 42%; }
-        .name { color: #ffd700; font-size: 14px; font-weight: bold; letter-spacing: 1px; margin-bottom: 5px; text-shadow: 0 0 10px rgba(255,215,0,0.5); }
-        .hp-bar { width: 100%; height: 12px; background: rgba(255,255,255,0.1); border: 1.5px solid #ffd700; border-radius: 4px; position: relative; overflow: hidden; }
-        .hp-fill { height: 100%; width: 100%; transition: width 0.2s ease-out; }
-        #p1-hp { background: linear-gradient(90deg, #ffd700, #ffaa00); box-shadow: 0 0 15px rgba(255,215,0,0.4); }
-        #p2-hp { background: linear-gradient(-90deg, #ff0000, #880000); box-shadow: 0 0 15px rgba(255,0,0,0.4); }
+        /* Health Bars & UI */
+        .ui { position: absolute; top: 20px; width: 100%; display: flex; justify-content: space-between; padding: 0 40px; box-sizing: border-box; pointer-events: none; z-index: 10; }
+        .bar-container { width: 40%; }
+        .name { color: #ffd700; font-size: 14px; font-weight: bold; margin-bottom: 5px; text-shadow: 0 0 10px gold; }
+        .bar { width: 100%; height: 12px; background: rgba(50,50,50,0.5); border: 2px solid #ffd700; border-radius: 6px; overflow: hidden; }
+        .fill { height: 100%; width: 100%; transition: width 0.3s; }
+        #p-hp { background: linear-gradient(90deg, #ffcc00, #ff6600); box-shadow: 0 0 15px gold; }
+        #e-hp { background: linear-gradient(-90deg, #ff0000, #990000); box-shadow: 0 0 15px red; }
 
-        /* Smooth Controls */
-        .controls { position: absolute; bottom: 40px; width: 100%; display: flex; justify-content: space-between; padding: 0 25px; box-sizing: border-box; }
-        .joystick, .actions { display: flex; gap: 12px; pointer-events: auto; }
-        .btn { width: 65px; height: 65px; background: rgba(0,0,0,0.7); border: 2px solid rgba(255,215,0,0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #ffd700; font-size: 24px; backdrop-filter: blur(8px); transition: 0.1s; }
-        .btn:active { transform: scale(1.1); border-color: #00ffff; box-shadow: 0 0 20px rgba(0,255,255,0.4); }
-        .btn-atk { border-color: #00ffff; color: #00ffff; }
-        
-        .credit { position: absolute; bottom: 10px; width: 100%; text-align: center; color: rgba(255,215,0,0.5); font-size: 11px; letter-spacing: 3px; }
+        /* Controls */
+        .controls { position: absolute; bottom: 35px; width: 100%; display: flex; justify-content: space-between; padding: 0 30px; box-sizing: border-box; z-index: 20; }
+        .btn-grp { display: flex; gap: 15px; }
+        .btn { width: 65px; height: 65px; background: rgba(0,0,0,0.7); border: 2px solid gold; border-radius: 15px; display: flex; align-items: center; justify-content: center; color: gold; font-size: 24px; pointer-events: auto; }
+        .btn:active { transform: scale(0.9); background: rgba(255, 215, 0, 0.3); }
+        .btn-atk { border-color: cyan; color: cyan; border-radius: 50%; }
+
+        .watermark { position: absolute; bottom: 10px; width: 100%; text-align: center; color: rgba(255,215,0,0.5); font-size: 10px; letter-spacing: 3px; pointer-events: none; }
     </style>
 </head>
 <body>
-    <div class="ui-layer">
-        <div class="health-box">
-            <div class="name">DOCTOR DARK</div>
-            <div class="hp-bar"><div id="p1-hp" class="hp-fill"></div></div>
+    <div class="ui">
+        <div class="bar-container">
+            <div class="name">PLAYER</div>
+            <div class="bar"><div id="p-hp" class="fill"></div></div>
         </div>
-        <div class="health-box" style="text-align: right;">
+        <div class="bar-container" style="text-align: right;">
             <div class="name">SHADOW BOSS</div>
-            <div class="hp-bar"><div id="p2-hp" class="hp-fill"></div></div>
+            <div class="bar"><div id="e-hp" class="fill"></div></div>
         </div>
     </div>
 
     <canvas id="game"></canvas>
-    <div class="credit">CODED BY DOCTOR DARK</div>
+    <div class="watermark">CODED BY DOCTOR DARK</div>
 
     <div class="controls">
-        <div class="joystick">
-            <div class="btn" onmousedown="move('l')" ontouchstart="move('l')">◀</div>
-            <div class="btn" onmousedown="move('r')" ontouchstart="move('r')">▶</div>
+        <div class="btn-grp">
+            <div class="btn" ontouchstart="input('l')">◀</div>
+            <div class="btn" ontouchstart="input('u')">▲</div>
+            <div class="btn" ontouchstart="input('r')">▶</div>
         </div>
-        <div class="actions">
-            <div class="btn btn-atk" onmousedown="attack()" ontouchstart="attack()">⚔️</div>
+        <div class="btn-grp">
+            <div class="btn btn-atk" ontouchstart="input('atk')">⚔️</div>
         </div>
     </div>
 
@@ -58,20 +59,12 @@
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        // Physics Config
-        const groundY = canvas.height - 120;
-        let shake = 0;
-
-        class ShadowPlayer {
+        class Fighter {
             constructor(x, color, side) {
-                this.x = x; this.y = groundY;
-                this.w = 70; this.h = 180;
-                this.color = color;
-                this.side = side; // 1 for right, -1 for left
-                this.hp = 100;
-                this.vx = 0;
-                this.isAttacking = false;
-                this.atkFrame = 0;
+                this.x = x; this.y = canvas.height - 150;
+                this.w = 80; this.h = 200;
+                this.hp = 100; this.side = side; this.color = color;
+                this.vx = 0; this.isAtk = false; this.atkTimer = 0;
             }
 
             draw() {
@@ -79,113 +72,81 @@
                 ctx.translate(this.x, this.y);
                 ctx.scale(this.side, 1);
                 
-                // Shadow Aura (Madham Roshni)
-                ctx.shadowBlur = 25;
-                ctx.shadowColor = this.color;
-                ctx.fillStyle = "#050505";
+                // Shadow Glow
+                ctx.shadowBlur = 30; ctx.shadowColor = this.color;
+                ctx.fillStyle = "#0a0a0a";
 
-                // Detailed Shadow Body
+                // Detailed Character Body
                 ctx.beginPath();
-                ctx.arc(0, -this.h + 20, 24, 0, Math.PI*2); // Head
+                ctx.arc(0, -180, 25, 0, Math.PI*2); // Head
                 ctx.fill();
-                
-                ctx.fillRect(-20, -this.h + 45, 40, 80); // Torso
-                ctx.fillRect(-18, -60, 15, 60); // Leg 1
-                ctx.fillRect(3, -60, 15, 60); // Leg 2
-                
-                // Sword Drawing
-                ctx.shadowBlur = 15;
-                ctx.strokeStyle = (this.color.includes('255, 0')) ? "#ff0000" : "#00ffff";
-                ctx.lineWidth = 5;
+                ctx.fillRect(-25, -150, 50, 90); // Torso
+                ctx.fillRect(-20, -60, 18, 60); // L-Leg
+                ctx.fillRect(2, -60, 18, 60);  // R-Leg
+
+                // Sword (Talwar)
+                ctx.strokeStyle = (this.side === 1) ? "#00ffff" : "#ff0000";
+                ctx.lineWidth = 5; ctx.shadowBlur = 15;
                 ctx.beginPath();
-                if(this.isAttacking) {
-                    ctx.moveTo(20, -100);
-                    ctx.lineTo(120, -90 + Math.sin(this.atkFrame)*20);
-                    ctx.stroke();
+                if(this.isAtk) {
+                    ctx.moveTo(25, -100); ctx.lineTo(130, -90); // Hit Pose
                 } else {
-                    ctx.moveTo(15, -100);
-                    ctx.lineTo(60, -160);
-                    ctx.stroke();
+                    ctx.moveTo(30, -110); ctx.lineTo(90, -180); // Idle Pose
                 }
+                ctx.stroke();
                 ctx.restore();
             }
 
             update() {
-                this.x += this.vx;
-                this.vx *= 0.85; // Friction for smoothness
-                if(this.isAttacking) {
-                    this.atkFrame++;
-                    if(this.atkFrame > 15) { this.isAttacking = false; this.atkFrame = 0; }
-                }
-                // Border constraint
-                this.x = Math.max(50, Math.min(canvas.width - 50, this.x));
+                this.x += this.vx; this.vx *= 0.8;
+                if(this.atkTimer > 0) this.atkTimer--; else this.isAtk = false;
+                this.x = Math.max(50, Math.min(canvas.width-50, this.x));
             }
         }
 
-        const p1 = new ShadowPlayer(canvas.width * 0.2, "rgba(0, 255, 255, 0.4)", 1);
-        const p2 = new ShadowPlayer(canvas.width * 0.8, "rgba(255, 0, 0, 0.4)", -1);
+        const p = new Fighter(canvas.width * 0.2, "rgba(0, 255, 255, 0.4)", 1);
+        const e = new Fighter(canvas.width * 0.8, "rgba(255, 0, 0, 0.4)", -1);
 
-        function move(dir) {
-            if(dir === 'l') { p1.vx = -12; p1.side = -1; }
-            if(dir === 'r') { p1.vx = 12; p1.side = 1; }
-        }
-
-        function attack() {
-            p1.isAttacking = true;
-            let dist = Math.abs(p1.x - p2.x);
-            if(dist < 150) {
-                p2.hp -= 8;
-                p2.vx = p1.side * 15; // Knockback effect
-                shake = 10;
+        function input(type) {
+            if(type === 'l') { p.vx = -15; p.side = -1; }
+            if(type === 'r') { p.vx = 15; p.side = 1; }
+            if(type === 'u' && p.y >= canvas.height - 155) { /* Jump */ }
+            if(type === 'atk') { 
+                p.isAtk = true; p.atkTimer = 10;
+                if(Math.abs(p.x - e.x) < 160) { e.hp -= 5; e.vx = p.side * 10; }
             }
         }
 
-        // Background Buildings
-        const bgs = Array.from({length: 10}, () => ({
-            x: Math.random() * canvas.width,
-            w: 80 + Math.random() * 120,
-            h: 300 + Math.random() * 300,
-            op: 0.3 + Math.random() * 0.4
-        }));
-
-        function animate() {
+        function drawScene() {
             ctx.fillStyle = "#020205";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            ctx.save();
-            if(shake > 0) {
-                ctx.translate(Math.random()*shake, Math.random()*shake);
-                shake *= 0.9;
-            }
-
-            // Draw Background Buildings
-            bgs.forEach(b => {
-                ctx.fillStyle = `rgba(10, 10, 15, ${b.op})`;
-                ctx.fillRect(b.x, groundY - b.h, b.w, b.h);
-            });
+            // Gate & Buildings Background
+            ctx.fillStyle = "rgba(15, 15, 20, 0.8)";
+            // Left Pillar
+            ctx.fillRect(canvas.width * 0.1, canvas.height - 600, 60, 450);
+            // Right Pillar
+            ctx.fillRect(canvas.width * 0.85, canvas.height - 600, 60, 450);
+            // Top Beam (Gate)
+            ctx.fillRect(canvas.width * 0.1, canvas.height - 600, canvas.width * 0.8, 40);
 
             // Ground
             ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
-            ctx.lineWidth = 3;
-            ctx.beginPath(); ctx.moveTo(0, groundY); ctx.lineTo(canvas.width, groundY); ctx.stroke();
+            ctx.lineWidth = 4;
+            ctx.beginPath(); ctx.moveTo(0, canvas.height-150); ctx.lineTo(canvas.width, canvas.height-150); ctx.stroke();
 
-            p1.update(); p2.update();
-            
-            // AI simple follow
-            if(Math.abs(p1.x - p2.x) > 130) {
-                p2.vx = (p1.x > p2.x) ? 2 : -2;
-                p2.side = (p1.x > p2.x) ? 1 : -1;
-            }
+            p.update(); e.update();
+            // Enemy AI simple move
+            if(Math.abs(p.x - e.x) > 130) e.vx = (p.x > e.x ? 2 : -2);
 
-            p1.draw(); p2.draw();
-            ctx.restore();
+            p.draw(); e.draw();
 
-            document.getElementById('p1-hp').style.width = p1.hp + "%";
-            document.getElementById('p2-hp').style.width = p2.hp + "%";
+            document.getElementById('p-hp').style.width = p.hp + "%";
+            document.getElementById('e-hp').style.width = e.hp + "%";
 
-            requestAnimationFrame(animate);
+            requestAnimationFrame(drawScene);
         }
-        animate();
+        drawScene();
     </script>
 </body>
 </html>
