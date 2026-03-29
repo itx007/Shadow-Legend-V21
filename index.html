@@ -3,12 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dr Dark: Shadow Legend V21 - Pro Edition</title>
+    <title>Dr Dark: Shadow Legend V21 - Ultimate Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap');
         body { margin: 0; background: #050505; font-family: 'Cinzel', serif; overflow: hidden; touch-action: none; }
         canvas { display: block; width: 100vw; height: 100vh; }
+        
+        /* UI Styling */
         .ui { position: absolute; top: 20px; width: 100%; display: flex; justify-content: space-between; padding: 0 40px; pointer-events: none; box-sizing: border-box; }
         .bar-container { width: 35%; position: relative; }
         .bar { width: 100%; height: 16px; background: #1a1a1a; border: 2px solid #ffd700; border-radius: 8px; overflow: hidden; }
@@ -16,23 +18,29 @@
         .energy-bar { width: 100%; height: 8px; background: #000; border: 1px solid #00ffff; margin-top: 5px; border-radius: 4px; overflow: hidden; }
         #pEnergyFill { width: 0%; height: 100%; background: #00ffff; box-shadow: 0 0 10px #00ffff; }
         .name-tag { color: #ffd700; font-size: 12px; margin-bottom: 4px; letter-spacing: 1px; }
-        .controls { position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: space-between; padding: 0 25px; z-index: 100; pointer-events: none; box-sizing: border-box; }
-        .move-btns { display: grid; grid-template-columns: repeat(3, 55px); gap: 8px; pointer-events: auto; }
-        .action-btns { display: flex; gap: 12px; pointer-events: auto; }
-        .btn { width: 55px; height: 55px; background: rgba(0,0,0,0.7); border: 2px solid #ffd700; border-radius: 12px; color: #ffd700; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; backdrop-filter: blur(4px); }
+
+        /* Mobile Controls */
+        .controls { position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: space-between; padding: 0 25px; z-index: 100; pointer-events: auto; box-sizing: border-box; }
+        .move-btns { display: grid; grid-template-columns: repeat(3, 55px); gap: 8px; }
+        .action-btns { display: flex; gap: 12px; align-items: flex-end; }
+        .btn { width: 55px; height: 55px; background: rgba(0,0,0,0.7); border: 2px solid #ffd700; border-radius: 12px; color: #ffd700; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; backdrop-filter: blur(4px); user-select: none; }
         .btn-hit { border-color: #00ffff; color: #00ffff; }
-        .btn-special { border-color: #ff00ff; color: #ff00ff; position: relative; }
-        .btn-special.ready::after { content: 'READY'; position: absolute; top: -20px; font-size: 10px; color: #00ffff; animation: blink 0.5s infinite; }
-        @keyframes blink { 50% { opacity: 0; } }
+        .btn-special { border-color: #ff00ff; color: #ff00ff; }
+        .ready { animation: pulse 0.5s infinite; box-shadow: 0 0 15px #ff00ff; }
+        @keyframes pulse { 50% { transform: scale(1.1); } }
+
+        /* Intro Screen */
         #intro { position: fixed; inset: 0; background: #000; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 1s; }
-        #intro h1 { color: #ffd700; font-size: 2rem; text-shadow: 0 0 20px #ffd700; }
-        .dr-dark-watermark { position: absolute; bottom: 5px; right: 10px; color: rgba(255,215,0,0.3); font-size: 10px; pointer-events: none; }
+        #logo-placeholder { width: 150px; height: 150px; border: 2px solid #ffd700; border-radius: 20px; display: flex; align-items: center; justify-content: center; color: #ffd700; font-size: 40px; margin-bottom: 20px; box-shadow: 0 0 30px #ffd700; }
+        
+        .watermark { position: absolute; bottom: 5px; right: 10px; color: rgba(255,215,0,0.4); font-size: 10px; }
     </style>
 </head>
 <body>
     <div id="intro">
-        <h1 id="introText">DOCTOR DARK PRESENTS</h1>
-        <p style="color: #00ffff; margin-top: 10px;">SHADOW LEGEND V21</p>
+        <div id="logo-placeholder">DR</div>
+        <h1 style="color: #ffd700; font-size: 1.5rem;">DOCTOR DARK PRESENTS</h1>
+        <p style="color: #00ffff; letter-spacing: 3px;">SHADOW LEGEND V21</p>
     </div>
 
     <div class="ui">
@@ -48,18 +56,18 @@
     </div>
 
     <canvas id="c"></canvas>
-    <div class="dr-dark-watermark">Coded by Doctor Dark</div>
+    <div class="watermark">CODED BY DOCTOR DARK</div>
 
     <div class="controls">
         <div class="move-btns">
-            <div style="grid-column:2" class="btn" onmousedown="move('u')" ontouchstart="move('u')">▲</div>
-            <div style="grid-column:1" class="btn" onmousedown="move('l')" ontouchstart="move('l')">◀</div>
-            <div style="grid-column:3" class="btn" onmousedown="move('r')" ontouchstart="move('r')">▶</div>
+            <div style="grid-column:2" class="btn" ontouchstart="move('u')">▲</div>
+            <div style="grid-column:1" class="btn" ontouchstart="move('l')">◀</div>
+            <div style="grid-column:3" class="btn" ontouchstart="move('r')">▶</div>
         </div>
         <div class="action-btns">
-            <div class="btn btn-hit" onmousedown="hit('p')" ontouchstart="hit('p')">👊</div>
-            <div class="btn btn-hit" onmousedown="hit('k')" ontouchstart="hit('k')">🦶</div>
-            <div id="specialBtn" class="btn btn-special" onmousedown="hit('s')" ontouchstart="hit('s')">⚔️</div>
+            <div class="btn btn-hit" ontouchstart="hit('p')">👊</div>
+            <div class="btn btn-hit" ontouchstart="hit('k')">🦶</div>
+            <div id="specialBtn" class="btn btn-special" ontouchstart="hit('s')">⚔️</div>
         </div>
     </div>
 
@@ -75,7 +83,11 @@
         window.addEventListener('resize', resize);
         resize();
 
-        setTimeout(() => { document.getElementById('intro').style.opacity = '0'; setTimeout(() => document.getElementById('intro').remove(), 1000); }, 2000);
+        // Remove Intro
+        setTimeout(() => { 
+            document.getElementById('intro').style.opacity = '0'; 
+            setTimeout(() => document.getElementById('intro').remove(), 1000); 
+        }, 2500);
 
         class Fighter {
             constructor(x, isPlayer) {
@@ -87,7 +99,7 @@
             update() {
                 this.vy += 0.8; this.vx *= 0.85; this.x += this.vx; this.y += this.vy;
                 if (this.y > canvas.height - 150) { this.y = canvas.height - 150; this.vy = 0; }
-                this.x = Math.max(20, Math.min(canvas.width - 20, this.x));
+                this.x = Math.max(30, Math.min(canvas.width - 30, this.x));
                 if (this.timer > 0) this.timer--; else this.state = 'idle';
             }
             draw() {
@@ -97,9 +109,11 @@
                 ctx.fillStyle = '#0a0a0a';
                 ctx.beginPath(); ctx.arc(0, -this.h + 20, 20, 0, Math.PI * 2); ctx.fill(); // Head
                 ctx.fillRect(-20, -this.h + 40, 40, 80); // Body
+                
+                // Sword effect
                 if (this.state === 's' && this.isPlayer) {
-                    ctx.strokeStyle = '#00ffff'; ctx.lineWidth = 5;
-                    ctx.beginPath(); ctx.moveTo(0, -80); ctx.lineTo(this.facing * 120, -80); ctx.stroke();
+                    ctx.strokeStyle = '#00ffff'; ctx.lineWidth = 8;
+                    ctx.beginPath(); ctx.moveTo(0, -80); ctx.lineTo(this.facing * 150, -80); ctx.stroke();
                 }
                 ctx.restore();
             }
@@ -117,41 +131,51 @@
         function hit(t) {
             if (t === 's' && p.energy < 100) return;
             p.state = t; p.timer = 20;
-            if (t === 's') { p.energy = 0; shake = 20; }
-            checkHit();
+            if (t === 's') { p.energy = 0; shake = 25; checkSpecialHit(); }
+            else { checkHit(); }
         }
 
         function checkHit() {
             let d = Math.abs(p.x - e.x);
-            if (d < 130 && p.state !== 'idle') {
-                let dmg = p.state === 's' ? 30 : 8;
-                e.hp -= dmg; p.energy = Math.min(100, p.energy + 10);
-                e.vx = p.facing * 20; shake = 10;
+            if (d < 120 && p.state !== 'idle') {
+                e.hp -= 8; p.energy = Math.min(100, p.energy + 15);
+                e.vx = p.facing * 15; shake = 8;
             }
+        }
+
+        function checkSpecialHit() {
+            let d = Math.abs(p.x - e.x);
+            if (d < 200) { e.hp -= 35; e.vx = p.facing * 30; }
         }
 
         function enemyAI() {
             if (e.hp <= 0) { round++; e.hp = 100; e.x = canvas.width - 100; return; }
             let dist = p.x - e.x;
-            e.vx = Math.sign(dist) * (3 + round);
-            if (Math.abs(dist) < 100 && Math.random() < 0.05) {
-                p.hp -= 5; p.vx = Math.sign(-dist) * 15; flash = 10;
+            
+            // Controlled Speed: Dushman ab Gujarati speed mein nahi daurega
+            e.vx = Math.sign(dist) * 2.5; 
+
+            if (Math.abs(dist) < 90 && Math.random() < 0.04) {
+                p.hp -= 6; p.vx = Math.sign(-dist) * 12; flash = 10;
             }
         }
 
         function draw() {
             ctx.fillStyle = '#050505'; ctx.fillRect(0, 0, canvas.width, canvas.height);
             if (flash > 0) { ctx.fillStyle = `rgba(255,0,0,${flash/20})`; ctx.fillRect(0,0,canvas.width,canvas.height); flash--; }
+            
             ctx.save();
             if (shake > 0) { ctx.translate(Math.random()*shake, Math.random()*shake); shake *= 0.9; }
             
-            // Floor
-            ctx.strokeStyle = '#ffd700'; ctx.beginPath(); ctx.moveTo(0, canvas.height-150); ctx.lineTo(canvas.width, canvas.height-150); ctx.stroke();
+            // Floor Line
+            ctx.strokeStyle = '#ffd700'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(0, canvas.height-150); ctx.lineTo(canvas.width, canvas.height-150); ctx.stroke();
             
             p.update(); e.update(); enemyAI();
             p.draw(); e.draw();
             ctx.restore();
 
+            // UI Update
             document.getElementById('pHealth').style.width = p.hp + '%';
             document.getElementById('eHealth').style.width = e.hp + '%';
             document.getElementById('pEnergyFill').style.width = p.energy + '%';
