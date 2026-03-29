@@ -5,24 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dr. Dark: Shadow Legend V21</title>
     <style>
-        body { margin: 0; background: #000; overflow: hidden; touch-action: none; font-family: 'Arial', sans-serif; }
+        body { margin: 0; background: #050505; overflow: hidden; touch-action: none; font-family: 'Arial', sans-serif; }
         canvas { display: block; width: 100vw; height: 100vh; }
         
-        /* Madham UI (Soft Glow) */
-        .ui { position: absolute; top: 20px; width: 100%; display: flex; justify-content: space-between; padding: 0 50px; box-sizing: border-box; pointer-events: none; }
+        /* UI Layer */
+        .ui { position: absolute; top: 20px; width: 100%; display: flex; justify-content: space-between; padding: 0 40px; box-sizing: border-box; pointer-events: none; z-index: 10; }
         .bar-wrap { width: 35%; }
-        .label { color: #ffd700; font-size: 14px; letter-spacing: 2px; text-shadow: 0 0 5px rgba(255,215,0,0.5); margin-bottom: 5px; }
-        .bar { width: 100%; height: 12px; background: rgba(50,50,50,0.5); border: 1px solid #ffd700; border-radius: 10px; overflow: hidden; }
+        .label { color: #ffd700; font-size: 12px; letter-spacing: 2px; margin-bottom: 5px; text-transform: uppercase; font-weight: bold; }
+        .bar { width: 100%; height: 10px; background: rgba(50,50,50,0.4); border: 1.5px solid #ffd700; border-radius: 5px; overflow: hidden; }
         .hp { height: 100%; width: 100%; transition: width 0.3s; }
-        #p-hp { background: linear-gradient(90deg, #ffd700, #ff8c00); box-shadow: 0 0 10px rgba(255,215,0,0.3); }
-        #e-hp { background: linear-gradient(-90deg, #ff0000, #800000); box-shadow: 0 0 10px rgba(255,0,0,0.3); }
+        #p-hp { background: linear-gradient(90deg, #ffcc00, #ff8c00); box-shadow: 0 0 10px rgba(255,200,0,0.3); }
+        #e-hp { background: linear-gradient(-90deg, #ff3300, #990000); box-shadow: 0 0 10px rgba(255,0,0,0.3); }
 
         /* Controls */
-        .controls { position: absolute; bottom: 40px; width: 100%; display: flex; justify-content: space-between; padding: 0 30px; box-sizing: border-box; }
-        .btn-grp { display: flex; gap: 15px; pointer-events: auto; }
-        .btn { width: 65px; height: 65px; border: 2px solid rgba(255,215,0,0.4); border-radius: 15px; display: flex; align-items: center; justify-content: center; color: #ffd700; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); font-size: 24px; }
-        .btn:active { transform: scale(0.9); border-color: #00ffff; color: #00ffff; }
-        .sp-btn { border-color: rgba(255,0,0,0.5); color: red; }
+        .controls { position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: space-around; z-index: 20; }
+        .btn-box { display: flex; gap: 15px; pointer-events: auto; }
+        .btn { width: 60px; height: 60px; border: 2px solid rgba(255,215,0,0.5); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #ffd700; background: rgba(0,0,0,0.6); font-size: 22px; backdrop-filter: blur(5px); }
+        .btn:active { transform: scale(0.9); background: rgba(255,215,0,0.2); }
+        
+        .watermark { position: absolute; bottom: 10px; width: 100%; text-align: center; color: #ffd700; font-size: 10px; letter-spacing: 2px; opacity: 0.6; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -37,119 +38,131 @@
         </div>
     </div>
 
-    <canvas id="stage"></canvas>
+    <canvas id="gameCanvas"></canvas>
+    <div class="watermark">CODED BY DOCTOR DARK</div>
 
     <div class="controls">
-        <div class="btn-grp">
+        <div class="btn-box">
             <div class="btn" ontouchstart="input('l')">◀</div>
             <div class="btn" ontouchstart="input('u')">▲</div>
             <div class="btn" ontouchstart="input('r')">▶</div>
         </div>
-        <div class="btn-grp">
-            <div class="btn" ontouchstart="input('atk')">👊</div>
-            <div class="btn sp-btn" ontouchstart="input('sp')">⚔️</div>
+        <div class="btn-box">
+            <div class="btn" style="border-color:#00ffff; color:#00ffff;" ontouchstart="input('atk')">👊</div>
         </div>
     </div>
 
     <script>
-        const canvas = document.getElementById('stage');
+        const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
 
-        class ShadowFighter {
-            constructor(x, color, side) {
+        // Background Buildings Logic
+        const buildings = [];
+        for(let i=0; i<15; i++) {
+            buildings.push({
+                x: Math.random() * canvas.width,
+                w: 60 + Math.random() * 100,
+                h: 200 + Math.random() * 400,
+                color: `rgba(15, 15, 20, ${0.5 + Math.random() * 0.5})`
+            });
+        }
+
+        class Fighter {
+            constructor(x, side, glowColor) {
                 this.x = x; this.y = canvas.height - 150;
-                this.hp = 100; this.side = side; // 1 for Player, -1 for Boss
-                this.color = color; // Glow color
-                this.frame = 0; this.state = 'idle';
+                this.side = side; this.glow = glowColor;
+                this.hp = 100; this.state = 'idle';
+                this.timer = 0;
             }
 
-            drawBody() {
+            draw() {
                 ctx.save();
                 ctx.translate(this.x, this.y);
                 ctx.scale(this.side, 1);
                 
-                // Madham Roshni (Soft Glow)
-                ctx.shadowBlur = 25;
-                ctx.shadowColor = this.color;
-                ctx.fillStyle = "#0a0a0a"; // Pure Shadow body
+                // Shadow Glow (Madham Roshni)
+                ctx.shadowBlur = 30;
+                ctx.shadowColor = this.glow;
+                ctx.fillStyle = "#080808";
 
-                // Realistic Body Path (Detailed Silhouette)
+                // Clean Silhouette Body
                 ctx.beginPath();
                 // Head
-                ctx.arc(0, -180, 22, 0, Math.PI * 2);
-                // Neck to Shoulder
-                ctx.moveTo(-10, -160); ctx.lineTo(-35, -150); ctx.lineTo(-30, -100);
-                // Chest & Abs
-                ctx.lineTo(-20, -60); ctx.lineTo(20, -60); ctx.lineTo(30, -100);
-                ctx.lineTo(35, -150); ctx.lineTo(10, -160);
-                // Legs
-                ctx.moveTo(-15, -60); ctx.lineTo(-25, 0); // L-Leg
-                ctx.moveTo(15, -60); ctx.lineTo(25, 0);   // R-Leg
+                ctx.arc(0, -180, 25, 0, Math.PI * 2);
+                // Body
+                ctx.moveTo(-15, -155);
+                ctx.lineTo(-30, -145); ctx.lineTo(-20, -60); // Torso Left
+                ctx.lineTo(20, -60); ctx.lineTo(30, -145);  // Torso Right
+                ctx.lineTo(15, -155);
                 ctx.fill();
 
-                // Weapon (Talwar)
-                this.drawSword();
-                ctx.restore();
-            }
-
-            drawSword() {
-                ctx.lineWidth = 4;
+                // Weapons (Sword)
                 ctx.shadowBlur = 15;
-                ctx.strokeStyle = (this.side === 1) ? "#00ffff" : "#ff0000"; // Player Blue, Boss Red
+                ctx.strokeStyle = (this.side === 1) ? "#00ffff" : "#ff3300";
                 ctx.shadowColor = ctx.strokeStyle;
-                
+                ctx.lineWidth = 5;
                 ctx.beginPath();
-                if (this.state === 'atk') {
-                    ctx.moveTo(20, -120); ctx.lineTo(130, -100); // Attack Swing
+                if(this.state === 'atk') {
+                    ctx.moveTo(25, -110); ctx.lineTo(130, -100);
                 } else {
-                    ctx.moveTo(30, -130); ctx.lineTo(90, -180); // Idle Pose
+                    ctx.moveTo(30, -120); ctx.lineTo(100, -180);
                 }
                 ctx.stroke();
-            }
-
-            update() {
-                if (this.state === 'atk') {
-                    this.frame++;
-                    if (this.frame > 10) { this.state = 'idle'; this.frame = 0; }
-                }
+                ctx.restore();
             }
         }
 
-        const p = new ShadowFighter(canvas.width * 0.25, "rgba(0, 255, 127, 0.4)", 1);
-        const e = new ShadowFighter(canvas.width * 0.75, "rgba(255, 0, 0, 0.4)", -1);
+        const p = new Fighter(canvas.width * 0.2, 1, "rgba(0, 255, 255, 0.3)");
+        const e = new Fighter(canvas.width * 0.8, -1, "rgba(255, 0, 0, 0.3)");
 
         function input(type) {
-            if (type === 'r') p.x += 20;
-            if (type === 'l') p.x -= 20;
-            if (type === 'atk') {
-                p.state = 'atk';
-                if (Math.abs(p.x - e.x) < 150) e.hp -= 5;
-            }
-            if (type === 'sp') {
-                p.state = 'atk'; p.x += 50; // Dash attack
-                if (Math.abs(p.x - e.x) < 200) e.hp -= 15;
+            if(type === 'r') p.x += 25;
+            if(type === 'l') p.x -= 25;
+            if(type === 'u' && p.y >= canvas.height - 155) { /* Jump logic */ }
+            if(type === 'atk') {
+                p.state = 'atk'; p.timer = 10;
+                if(Math.abs(p.x - e.x) < 160) e.hp -= 5;
             }
         }
 
-        function loop() {
-            ctx.fillStyle = "#000"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Floor
-            ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
-            ctx.beginPath(); ctx.moveTo(0, canvas.height - 150); ctx.lineTo(canvas.width, canvas.height - 150); ctx.stroke();
+        function drawFrame() {
+            // Dark night background
+            ctx.fillStyle = "#020205";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            p.update(); p.drawBody();
-            e.update(); e.drawBody();
+            // Draw Buildings (Shadow Background)
+            buildings.forEach(b => {
+                ctx.fillStyle = b.color;
+                ctx.fillRect(b.x, canvas.height - b.h - 150, b.w, b.h);
+                // Windows lighting
+                if(Math.random() > 0.98) ctx.fillStyle = "rgba(255,255,200,0.2)";
+                ctx.fillRect(b.x + 10, canvas.height - b.h + 20 - 150, 5, 5);
+            });
+
+            // Floor Line
+            ctx.strokeStyle = "rgba(255, 215, 0, 0.15)";
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(0, canvas.height-150); ctx.lineTo(canvas.width, canvas.height-150); ctx.stroke();
+
+            // Update States
+            if(p.timer > 0) p.timer--; else p.state = 'idle';
+
+            p.draw(); e.draw();
 
             // UI
             document.getElementById('p-hp').style.width = p.hp + "%";
             document.getElementById('e-hp').style.width = e.hp + "%";
 
-            requestAnimationFrame(loop);
+            requestAnimationFrame(drawFrame);
         }
-        loop();
+        drawFrame();
     </script>
 </body>
 </html>
