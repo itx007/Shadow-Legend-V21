@@ -3,277 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dr Dark: Shadow Legend V21 - Pro</title>
+    <title>Dr Dark: Shadow Legend V21 - Pro Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap');
-        
-        body { 
-            margin: 0; 
-            background: #050505; 
-            font-family: 'Cinzel', serif; 
-            overflow: hidden; 
-            touch-action: none;
-        }
-        
-        canvas { 
-            display: block; 
-            width: 100vw; 
-            height: 100vh; 
-        }
-        
-        /* Health Bars */
-        .ui { 
-            position: absolute; 
-            top: 20px; 
-            width: 100%; 
-            display: flex; 
-            justify-content: space-between; 
-            padding: 0 40px;
-            pointer-events: none; 
-            box-sizing: border-box;
-        }
-        
-        .bar-container { width: 40%; position: relative; }
-        
-        .bar { 
-            width: 100%;
-            height: 20px; 
-            background: #1a1a1a; 
-            border: 2px solid #ffd700; 
-            border-radius: 10px; 
-            overflow: hidden; 
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
-        }
-        
-        .fill { 
-            height: 100%; 
-            width: 100%; 
-            background: linear-gradient(90deg, #ff0000, #ff6600, #ffd700); 
-            transition: width 0.3s ease-out;
-        }
-        
-        .enemy-fill { background: linear-gradient(90deg, #660000, #ff0000); transform-origin: right; }
-        
-        .name-tag {
-            color: #ffd700;
-            font-size: 14px;
-            margin-bottom: 5px;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
-            letter-spacing: 2px;
-        }
-        
-        /* Mobile Controls */
-        .controls { 
-            position: absolute; 
-            bottom: 30px; 
-            width: 100%; 
-            display: flex; 
-            justify-content: space-between; 
-            padding: 0 30px; 
-            z-index: 100; 
-            pointer-events: none;
-            box-sizing: border-box;
-        }
-        
-        .move-btns { 
-            display: grid; 
-            grid-template-columns: repeat(3, 60px); 
-            grid-template-rows: repeat(2, 60px);
-            gap: 8px; 
-            pointer-events: auto; 
-        }
-        
-        .action-btns { 
-            display: flex; 
-            gap: 15px; 
-            align-items: flex-end;
-            pointer-events: auto; 
-        }
-        
-        .btn { 
-            width: 60px; 
-            height: 60px; 
-            background: rgba(0,0,0,0.6); 
-            border: 2px solid #ffd700; 
-            border-radius: 12px; 
-            color: #ffd700; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 1.2rem;
-            cursor: pointer;
-            backdrop-filter: blur(4px);
-        }
-        
-        .btn-hit { 
-            width: 70px; 
-            height: 70px; 
-            border-radius: 50%; 
-            border: 3px solid #00ffff; 
-            background: rgba(0,255,255,0.1); 
-            font-size: 1.8rem; 
-            box-shadow: 0 0 20px rgba(0,255,255,0.4);
-        }
-
-        .round-indicator {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #ffd700;
-            font-size: 48px;
-            font-weight: 900;
-            text-shadow: 0 0 30px rgba(255,215,0,0.8);
-            opacity: 0;
-            pointer-events: none;
-        }
-        .round-show { opacity: 1; animation: pulse 1s ease-in-out; }
-        @keyframes pulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -50%) scale(1.2); } }
+        body { margin: 0; background: #050505; font-family: 'Cinzel', serif; overflow: hidden; touch-action: none; }
+        canvas { display: block; width: 100vw; height: 100vh; }
+        .ui { position: absolute; top: 20px; width: 100%; display: flex; justify-content: space-between; padding: 0 40px; pointer-events: none; box-sizing: border-box; }
+        .bar-container { width: 35%; position: relative; }
+        .bar { width: 100%; height: 16px; background: #1a1a1a; border: 2px solid #ffd700; border-radius: 8px; overflow: hidden; }
+        .fill { height: 100%; width: 100%; background: linear-gradient(90deg, #ff0000, #ffcc00); transition: width 0.3s; }
+        .energy-bar { width: 100%; height: 8px; background: #000; border: 1px solid #00ffff; margin-top: 5px; border-radius: 4px; overflow: hidden; }
+        #pEnergyFill { width: 0%; height: 100%; background: #00ffff; box-shadow: 0 0 10px #00ffff; }
+        .name-tag { color: #ffd700; font-size: 12px; margin-bottom: 4px; letter-spacing: 1px; }
+        .controls { position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: space-between; padding: 0 25px; z-index: 100; pointer-events: none; box-sizing: border-box; }
+        .move-btns { display: grid; grid-template-columns: repeat(3, 55px); gap: 8px; pointer-events: auto; }
+        .action-btns { display: flex; gap: 12px; pointer-events: auto; }
+        .btn { width: 55px; height: 55px; background: rgba(0,0,0,0.7); border: 2px solid #ffd700; border-radius: 12px; color: #ffd700; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; backdrop-filter: blur(4px); }
+        .btn-hit { border-color: #00ffff; color: #00ffff; }
+        .btn-special { border-color: #ff00ff; color: #ff00ff; position: relative; }
+        .btn-special.ready::after { content: 'READY'; position: absolute; top: -20px; font-size: 10px; color: #00ffff; animation: blink 0.5s infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+        #intro { position: fixed; inset: 0; background: #000; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 1s; }
+        #intro h1 { color: #ffd700; font-size: 2rem; text-shadow: 0 0 20px #ffd700; }
+        .dr-dark-watermark { position: absolute; bottom: 5px; right: 10px; color: rgba(255,215,0,0.3); font-size: 10px; pointer-events: none; }
     </style>
 </head>
 <body>
+    <div id="intro">
+        <h1 id="introText">DOCTOR DARK PRESENTS</h1>
+        <p style="color: #00ffff; margin-top: 10px;">SHADOW LEGEND V21</p>
+    </div>
+
     <div class="ui">
         <div class="bar-container">
             <div class="name-tag">PLAYER</div>
             <div class="bar"><div id="pHealth" class="fill"></div></div>
+            <div class="energy-bar"><div id="pEnergyFill"></div></div>
         </div>
         <div class="bar-container" style="text-align: right;">
-            <div class="name-tag">SHADOW ENEMY</div>
-            <div class="bar"><div id="eHealth" class="fill enemy-fill"></div></div>
+            <div class="name-tag">SHADOW BOSS</div>
+            <div class="bar"><div id="eHealth" class="fill" style="background: red;"></div></div>
         </div>
     </div>
-    
-    <div class="round-indicator" id="roundIndicator">ROUND 1</div>
+
     <canvas id="c"></canvas>
-    
+    <div class="dr-dark-watermark">Coded by Doctor Dark</div>
+
     <div class="controls">
         <div class="move-btns">
-            <div style="grid-column:2; grid-row:1" class="btn" ontouchstart="move('u')">▲</div>
-            <div style="grid-column:1; grid-row:2" class="btn" ontouchstart="move('l')">◀</div>
-            <div style="grid-column:3; grid-row:2" class="btn" ontouchstart="move('r')">▶</div>
+            <div style="grid-column:2" class="btn" onmousedown="move('u')" ontouchstart="move('u')">▲</div>
+            <div style="grid-column:1" class="btn" onmousedown="move('l')" ontouchstart="move('l')">◀</div>
+            <div style="grid-column:3" class="btn" onmousedown="move('r')" ontouchstart="move('r')">▶</div>
         </div>
         <div class="action-btns">
-            <div class="btn btn-hit" ontouchstart="hit('p')">👊</div>
-            <div class="btn btn-hit" ontouchstart="hit('k')">🦶</div>
-            <div class="btn btn-hit" style="border-color: #ffd700; color: #ffd700;" ontouchstart="hit('s')">⚔️</div>
+            <div class="btn btn-hit" onmousedown="hit('p')" ontouchstart="hit('p')">👊</div>
+            <div class="btn btn-hit" onmousedown="hit('k')" ontouchstart="hit('k')">🦶</div>
+            <div id="specialBtn" class="btn btn-special" onmousedown="hit('s')" ontouchstart="hit('s')">⚔️</div>
         </div>
     </div>
 
     <script>
         const canvas = document.getElementById('c');
         const ctx = canvas.getContext('2d');
-        let shake = 0;
+        let shake = 0, flash = 0, round = 1;
 
         function resize() {
-            canvas.width = window.innerWidth * window.devicePixelRatio;
-            canvas.height = window.innerHeight * window.devicePixelRatio;
-            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
         }
-        resize();
         window.addEventListener('resize', resize);
+        resize();
 
-        class ParticleSystem {
-            constructor() { this.particles = []; }
-            emit(x, y, color, count = 10, speed = 8) {
-                for (let i = 0; i < count; i++) {
-                    const angle = Math.random() * Math.PI * 2;
-                    this.particles.push({
-                        x: x, y: y,
-                        vx: Math.cos(angle) * speed * Math.random(),
-                        vy: Math.sin(angle) * speed * Math.random(),
-                        life: 1.0, color: color, size: Math.random() * 4 + 2
-                    });
-                }
-            }
-            update() {
-                for (let i = this.particles.length - 1; i >= 0; i--) {
-                    const p = this.particles[i];
-                    p.x += p.vx; p.y += p.vy; p.vy += 0.3; p.life -= 0.03;
-                    if (p.life <= 0) this.particles.splice(i, 1);
-                }
-            }
-            draw(ctx) {
-                this.particles.forEach(p => {
-                    ctx.save(); ctx.globalAlpha = p.life; ctx.fillStyle = p.color;
-                    ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill(); ctx.restore();
-                });
-            }
-        }
-        
-        const particles = new ParticleSystem();
+        setTimeout(() => { document.getElementById('intro').style.opacity = '0'; setTimeout(() => document.getElementById('intro').remove(), 1000); }, 2000);
 
         class Fighter {
             constructor(x, isPlayer) {
-                this.x = x; this.y = window.innerHeight - 150;
-                this.vx = 0; this.vy = 0; this.w = 80; this.h = 200;
-                this.isPlayer = isPlayer; this.facing = isPlayer ? 1 : -1;
-                this.hp = 100; this.state = 'idle'; this.stateTimer = 0;
+                this.x = x; this.y = canvas.height - 150; this.vx = 0; this.vy = 0;
+                this.w = 60; this.h = 160; this.isPlayer = isPlayer;
+                this.hp = 100; this.energy = 0; this.facing = isPlayer ? 1 : -1;
+                this.state = 'idle'; this.timer = 0;
             }
             update() {
                 this.vy += 0.8; this.vx *= 0.85; this.x += this.vx; this.y += this.vy;
-                if (this.y >= window.innerHeight - 150) { this.y = window.innerHeight - 150; this.vy = 0; }
-                this.stateTimer++;
-                if (this.state !== 'idle' && this.stateTimer > 25) this.state = 'idle';
+                if (this.y > canvas.height - 150) { this.y = canvas.height - 150; this.vy = 0; }
+                this.x = Math.max(20, Math.min(canvas.width - 20, this.x));
+                if (this.timer > 0) this.timer--; else this.state = 'idle';
             }
-            draw(ctx) {
+            draw() {
                 ctx.save();
-                ctx.shadowBlur = 20; ctx.shadowColor = this.isPlayer ? '#00ffff' : '#ff0000';
                 ctx.translate(this.x, this.y);
+                ctx.shadowBlur = 20; ctx.shadowColor = this.isPlayer ? '#00ffff' : '#ff0000';
                 ctx.fillStyle = '#0a0a0a';
-                ctx.beginPath(); ctx.arc(0, -this.h + 25, 25, 0, Math.PI * 2); ctx.fill();
-                ctx.fillRect(-this.w/2, -this.h + 50, this.w, this.h - 100);
-                if (this.state === 's') {
-                    ctx.strokeStyle = '#00ffff'; ctx.lineWidth = 4;
-                    ctx.beginPath(); ctx.moveTo(20, -100); ctx.lineTo(20 + this.facing * 150, -110); ctx.stroke();
+                ctx.beginPath(); ctx.arc(0, -this.h + 20, 20, 0, Math.PI * 2); ctx.fill(); // Head
+                ctx.fillRect(-20, -this.h + 40, 40, 80); // Body
+                if (this.state === 's' && this.isPlayer) {
+                    ctx.strokeStyle = '#00ffff'; ctx.lineWidth = 5;
+                    ctx.beginPath(); ctx.moveTo(0, -80); ctx.lineTo(this.facing * 120, -80); ctx.stroke();
                 }
                 ctx.restore();
             }
         }
 
-        let p = new Fighter(window.innerWidth * 0.3, true);
-        let e = new Fighter(window.innerWidth * 0.7, false);
-
-        function draw() {
-            ctx.fillStyle = 'rgba(5, 5, 5, 0.3)';
-            ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
-            
-            ctx.save();
-            if (shake > 0) { ctx.translate(Math.random() * shake, Math.random() * shake); shake *= 0.9; }
-            
-            p.update(); e.update();
-            p.draw(ctx); e.draw(ctx);
-            particles.update(); particles.draw(ctx);
-            
-            // Basic Enemy AI
-            if (e.x > p.x + 150) e.vx = -2; else if (e.x < p.x - 150) e.vx = 2;
-            if (Math.random() < 0.02 && Math.abs(p.x - e.x) < 200) e.state = 'p';
-
-            // Health Update
-            document.getElementById('pHealth').style.width = p.hp + '%';
-            document.getElementById('eHealth').style.width = e.hp + '%';
-            
-            ctx.restore();
-            requestAnimationFrame(draw);
-        }
+        const p = new Fighter(100, true);
+        const e = new Fighter(canvas.width - 100, false);
 
         function move(dir) {
-            if (dir === 'l') { p.vx = -15; p.facing = -1; }
-            if (dir === 'r') { p.vx = 15; p.facing = 1; }
-            if (dir === 'u' && p.y >= window.innerHeight - 155) p.vy = -18;
+            if (dir === 'l') { p.vx = -12; p.facing = -1; }
+            if (dir === 'r') { p.vx = 12; p.facing = 1; }
+            if (dir === 'u' && p.y >= canvas.height - 155) p.vy = -18;
         }
 
-        function hit(type) {
-            p.state = type; p.stateTimer = 0;
-            if (type === 's') {
-                particles.emit(p.x + (p.facing * 100), p.y - 100, '#00ffff', 10, 5);
-                shake = 8;
-                if (Math.abs(p.x - e.x) < 250) e.hp -= 10;
-            } else if (Math.abs(p.x - e.x) < 150) {
-                e.hp -= 5; shake = 3;
+        function hit(t) {
+            if (t === 's' && p.energy < 100) return;
+            p.state = t; p.timer = 20;
+            if (t === 's') { p.energy = 0; shake = 20; }
+            checkHit();
+        }
+
+        function checkHit() {
+            let d = Math.abs(p.x - e.x);
+            if (d < 130 && p.state !== 'idle') {
+                let dmg = p.state === 's' ? 30 : 8;
+                e.hp -= dmg; p.energy = Math.min(100, p.energy + 10);
+                e.vx = p.facing * 20; shake = 10;
             }
         }
 
+        function enemyAI() {
+            if (e.hp <= 0) { round++; e.hp = 100; e.x = canvas.width - 100; return; }
+            let dist = p.x - e.x;
+            e.vx = Math.sign(dist) * (3 + round);
+            if (Math.abs(dist) < 100 && Math.random() < 0.05) {
+                p.hp -= 5; p.vx = Math.sign(-dist) * 15; flash = 10;
+            }
+        }
+
+        function draw() {
+            ctx.fillStyle = '#050505'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            if (flash > 0) { ctx.fillStyle = `rgba(255,0,0,${flash/20})`; ctx.fillRect(0,0,canvas.width,canvas.height); flash--; }
+            ctx.save();
+            if (shake > 0) { ctx.translate(Math.random()*shake, Math.random()*shake); shake *= 0.9; }
+            
+            // Floor
+            ctx.strokeStyle = '#ffd700'; ctx.beginPath(); ctx.moveTo(0, canvas.height-150); ctx.lineTo(canvas.width, canvas.height-150); ctx.stroke();
+            
+            p.update(); e.update(); enemyAI();
+            p.draw(); e.draw();
+            ctx.restore();
+
+            document.getElementById('pHealth').style.width = p.hp + '%';
+            document.getElementById('eHealth').style.width = e.hp + '%';
+            document.getElementById('pEnergyFill').style.width = p.energy + '%';
+            document.getElementById('specialBtn').classList.toggle('ready', p.energy === 100);
+
+            requestAnimationFrame(draw);
+        }
         draw();
     </script>
 </body>
