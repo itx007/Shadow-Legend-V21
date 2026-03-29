@@ -3,74 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dr Dark: Shadow Legend V21 - Pro Ultimate</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Dr. Dark: Shadow Legend V21</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap');
-        body { margin: 0; background: #050505; font-family: 'Cinzel', serif; overflow: hidden; touch-action: none; }
+        /* Base Styling */
+        body { margin: 0; background: #050505; color: #ffd700; font-family: 'Times New Roman', serif; overflow: hidden; touch-action: none; user-select: none; }
         canvas { display: block; width: 100vw; height: 100vh; }
-        .ui { position: absolute; top: 15px; width: 100%; display: flex; justify-content: space-between; padding: 0 40px; pointer-events: none; box-sizing: border-box; }
-        .bar-container { width: 35%; }
-        .bar { width: 100%; height: 14px; background: #1a1a1a; border: 2px solid #ffd700; border-radius: 8px; overflow: hidden; }
-        .fill { height: 100%; width: 100%; background: linear-gradient(90deg, #ff0000, #ffcc00); transition: width 0.3s ease-out; }
-        .energy-bar { width: 100%; height: 8px; background: #000; border: 1px solid #00ffff; margin-top: 4px; border-radius: 4px; overflow: hidden; }
-        #pEnergyFill { width: 0%; height: 100%; background: #00ffff; box-shadow: 0 0 10px #00ffff; transition: width 0.1s; }
-        .name-tag { color: #ffd700; font-size: 11px; margin-bottom: 3px; letter-spacing: 1px; }
-        .controls { position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: space-between; padding: 0 25px; z-index: 100; pointer-events: auto; box-sizing: border-box; user-select: none; }
-        .move-btns { display: grid; grid-template-columns: repeat(3, 55px); gap: 8px; }
-        .action-btns { display: flex; gap: 12px; align-items: flex-end; }
-        .btn { width: 55px; height: 55px; background: rgba(0,0,0,0.7); border: 2px solid #ffd700; border-radius: 12px; color: #ffd700; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; backdrop-filter: blur(4px); transition: transform 0.1s; }
-        .btn:active { transform: scale(0.9); background: rgba(255,215,0,0.3); }
-        .btn-hit { border-color: #00ffff; color: #00ffff; }
-        .btn-special { border-color: #ff00ff; color: #ff00ff; position: relative; }
-        .btn-special.ready::after { content: 'READY'; position: absolute; top: -18px; font-size: 9px; color: #ff00ff; animation: blink 0.5s infinite; }
-        @keyframes blink { 50% { opacity: 0; } }
-        #intro { position: fixed; inset: 0; background: #000; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 1s; }
-        #logo-placeholder { width: 120px; height: 120px; border: 2px solid #ffd700; border-radius: 20px; display: flex; align-items: center; justify-content: center; color: #ffd700; font-size: 35px; margin-bottom: 20px; box-shadow: 0 0 30px #ffd700; animation: logoGlow 1s infinite alternate; }
-        @keyframes logoGlow { from { box-shadow: 0 0 20px #ffd700; } to { box-shadow: 0 0 40px #ffd700; } }
-        .dr-dark-watermark { position: absolute; bottom: 5px; right: 10px; color: rgba(255,215,0,0.3); font-size: 9px; pointer-events: none; }
+        
+        /* UI Layer (Status Bars) */
+        .ui { position: absolute; top: 10px; width: 100%; display: flex; justify-content: space-between; padding: 0 40px; box-sizing: border-box; pointer-events: none; z-index: 10; }
+        .bar-container { width: 40%; position: relative; }
+        .bar-label { font-size: 14px; margin-bottom: 2px; text-shadow: 0 0 5px gold; }
+        .bar { width: 100%; height: 16px; background: #1a1a1a; border: 2px solid #ffd700; border-radius: 8px; overflow: hidden; }
+        .pFill { height: 100%; width: 100%; background: linear-gradient(90deg, #ffd700, #ff6600, #ff0000); transition: width 0.3s ease-out; box-shadow: 0 0 10px gold; }
+        .eFill { height: 100%; width: 100%; background: linear-gradient(-90deg, #ff0000, #660000, #000); transform-origin: right; box-shadow: 0 0 10px red; }
+        .energy { width: 100%; height: 6px; background: #000; border: 1px solid #ffd700; margin-top: 4px; border-radius: 3px; }
+        .energyFill { height: 100%; width: 0%; background: cyan; box-shadow: 0 0 5px cyan; transition: width 0.1s; }
+        
+        /* Mobile Touch Controls */
+        .controls { position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: space-between; padding: 0 30px; box-sizing: border-box; z-index: 10; pointer-events: none; }
+        .move-btns { display: grid; grid-template-columns: repeat(3, 60px); grid-template-rows: repeat(2, 60px); gap: 10px; pointer-events: auto; }
+        .action-btns { display: flex; gap: 15px; align-items: flex-end; pointer-events: auto; }
+        .btn { width: 60px; height: 60px; background: rgba(0,0,0,0.6); border: 2px solid gold; border-radius: 12px; color: gold; font-size: 1.4rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.1s; backdrop-filter: blur(5px); }
+        .btn:active { transform: scale(0.9); background: rgba(255, 215, 0, 0.3); }
+        .btn-jump { grid-column: 2; grid-row: 1; }
+        .btn-l { grid-column: 1; grid-row: 2; }
+        .btn-r { grid-column: 3; grid-row: 2; }
+        .btn-hit { border-radius: 50%; border-color: cyan; color: cyan; font-size: 1.8rem; box-shadow: 0 0 15px cyan; }
+        .btn-special { border-color: red; color: red; font-size: 2rem; box-shadow: 0 0 15px red; }
+        .watermark { position: absolute; bottom: 5px; width: 100%; text-align: center; font-size: 10px; color: rgba(255,215,0,0.4); pointer-events: none; }
     </style>
 </head>
 <body>
-    <div id="intro">
-        <div id="logo-placeholder">DR</div>
-        <h1 style="color: #ffd700; font-size: 1.3rem;">DOCTOR DARK PRESENTS</h1>
-        <p style="color: #00ffff; letter-spacing: 3px; font-size: 12px;">SHADOW LEGEND V21</p>
-    </div>
-
     <div class="ui">
         <div class="bar-container">
-            <div class="name-tag">PLAYER</div>
-            <div class="bar"><div id="pHealth" class="fill"></div></div>
-            <div class="energy-bar"><div id="pEnergyFill"></div></div>
+            <div class="bar-label">PLAYER</div>
+            <div class="bar"><div id="pHealthFill" class="pFill"></div></div>
+            <div class="energy"><div id="pEnergyFill" class="energyFill"></div></div>
         </div>
         <div class="bar-container" style="text-align: right;">
-            <div class="name-tag">SHADOW BOSS</div>
-            <div class="bar"><div id="eHealth" class="fill enemy-fill" style="background: red;"></div></div>
+            <div class="bar-label">SHADOW BOSS</div>
+            <div class="bar"><div id="eHealthFill" class="eFill"></div></div>
         </div>
     </div>
-
-    <canvas id="c"></canvas>
-    <div class="dr-dark-watermark">Coded by Doctor Dark</div>
-
+    
+    <canvas id="gameCanvas"></canvas>
+    <div class="watermark">CODED BY DOCTOR DARK</div>
+    
     <div class="controls">
         <div class="move-btns">
-            <div style="grid-column:2" class="btn" ontouchstart="move('u')">▲</div>
-            <div style="grid-column:1" class="btn" ontouchstart="move('l')">◀</div>
-            <div style="grid-column:3" class="btn" ontouchstart="move('r')">▶</div>
+            <div class="btn btn-jump" ontouchstart="move('u')">▲</div>
+            <div class="btn btn-l" ontouchstart="move('l')">◀</div>
+            <div class="btn btn-r" ontouchstart="move('r')">▶</div>
         </div>
         <div class="action-btns">
-            <div class="btn btn-hit" ontouchstart="hit('p')">👊</div>
-            <div class="btn btn-hit" ontouchstart="hit('k')">🦶</div>
-            <div id="specialBtn" class="btn btn-special" ontouchstart="hit('s')">⚔️</div>
+            <div class="btn btn-hit" ontouchstart="attack('p')">👊</div>
+            <div class="btn btn-special" ontouchstart="attack('s')">⚔️</div>
         </div>
     </div>
 
     <script>
-        const canvas = document.getElementById('c');
+        const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        let shake = 0, flash = 0, round = 1, particles = [];
-
+        let shake = 0;
+        
         function resize() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -78,161 +73,137 @@
         window.addEventListener('resize', resize);
         resize();
 
-        // Remove Intro
-        setTimeout(() => { document.getElementById('intro').style.opacity = '0'; setTimeout(() => document.getElementById('intro').remove(), 1000); }, 2500);
-
         class Fighter {
-            constructor(x, isPlayer) {
-                this.x = x; this.y = canvas.height - 180; this.vx = 0; this.vy = 0;
-                this.w = 60; this.h = 180; this.isPlayer = isPlayer;
-                this.hp = 100; this.energy = 0; this.facing = isPlayer ? 1 : -1;
-                this.state = 'idle'; this.timer = 0; this.anim = 0;
+            constructor(x, y, color, type) {
+                this.x = x; this.y = y; this.w = 100; this.h = 240; // Proper detailed size
+                this.vx = 0; this.vy = 0; this.color = color; this.type = type;
+                this.hp = 100; this.energy = 0; this.state = 'idle'; this.facing = 1; this.stateTimer = 0;
+                this.swordY = -this.h * 0.45; // Fixed relative sword position
             }
             update() {
+                // Gravity & Movement
                 this.vy += 0.8; this.vx *= 0.85; this.x += this.vx; this.y += this.vy;
                 if (this.y > canvas.height - 180) { this.y = canvas.height - 180; this.vy = 0; }
-                this.x = Math.max(30, Math.min(canvas.width - 30, this.x));
-                if (this.timer > 0) this.timer--; else this.state = 'idle';
-                this.anim += 0.1;
+                this.x = Math.max(50, Math.min(canvas.width - 50, this.x));
+                
+                // State management
+                if (this.stateTimer > 0) this.stateTimer--; else this.state = 'idle';
             }
             draw() {
                 ctx.save();
                 ctx.translate(this.x, this.y);
-                ctx.shadowBlur = 20; 
                 
-                // Color Variety
-                let mainColor = '#0a0a0a';
-                let glowColor = this.isPlayer ? '#00ffff' : `hsl(${(round*60)%360}, 100%, 50%)`;
-                ctx.shadowColor = glowColor;
-
-                // Human Body Part Drawing
-                ctx.fillStyle = mainColor;
-                let legAnim = Math.sin(this.anim) * 15;
-                let armAnim = Math.sin(this.anim + Math.PI) * 15;
-
+                // Core Silhouette Body
+                ctx.fillStyle = '#0a0a0a';
+                ctx.shadowBlur = 30; ctx.shadowColor = this.color;
+                
                 // Head
-                ctx.beginPath(); ctx.arc(0, -this.h + 25, 25, 0, Math.PI * 2); ctx.fill(); 
-                // Body
-                ctx.fillRect(-20, -this.h + 50, 40, legAnim); 
-                // Arms
-                ctx.fillRect(-35, -this.h + 60, 15, 60 + armAnim); // Left
-                ctx.fillRect(20, -this.h + 60, 15, 60 - armAnim); // Right
-                // Legs
-                ctx.fillRect(-20, -50 + legAnim, 18, 60); // Left
-                ctx.fillRect(2, -50 - legAnim, 18, 60); // Right
-
-                // Weapon: Sword always visible for player
-                if (this.isPlayer) {
-                    ctx.save();
-                    ctx.strokeStyle = '#00ffff'; ctx.lineWidth = 6;
-                    ctx.shadowBlur = 10; ctx.shadowColor = '#00ffff';
-                    let swordY = -this.h/2 - 20;
+                ctx.beginPath(); ctx.arc(0, -this.h + 25, 25, 0, Math.PI * 2); ctx.fill();
+                // Detailed Torso
+                ctx.fillRect(-this.w/2, -this.h + 50, this.w, this.h * 0.5);
+                // Simple Limbs for effect
+                ctx.fillRect(-this.w/2 - 10, -this.h * 0.4, 15, this.h * 0.45); // Arm
+                ctx.fillRect(-this.w/2 + 5, -50, 20, 50); // Leg L
+                ctx.fillRect(this.w/2 - 25, -50, 20, 50); // Leg R
+                
+                // Weapon Drawing
+                ctx.restore();
+                this.drawSword();
+            }
+            drawSword() {
+                ctx.save(); ctx.translate(this.x, this.y);
+                ctx.shadowBlur = 10; ctx.shadowColor = this.color;
+                ctx.strokeStyle = this.color; ctx.lineWidth = 6;
+                let weaponX = this.facing * (this.w/2 + 10);
+                
+                if (this.type === 'player') { // Player's cyan Sword
+                    ctx.save(); ctx.lineWidth = 4; ctx.strokeStyle = '#00ffff'; ctx.shadowColor = '#00ffff';
                     ctx.beginPath();
-                    if (this.state === 's') { // Special swing animation
-                        let swingProgress = this.timer / 20;
-                        ctx.moveTo(0, swordY);
-                        ctx.lineTo(this.facing * (160 * (1 - swingProgress)), swordY - 60 * Math.sin(swingProgress * Math.PI));
-                        addParticles(this.x + this.facing * 80, this.y + swordY);
-                    } else { // Static holding
-                        ctx.moveTo(25, -this.h/2);
-                        ctx.lineTo(25 + this.facing * 80, swordY + Math.sin(this.anim)*5);
+                    if (this.state === 'specialAttack') { // Swing animation
+                        let swingProg = this.stateTimer / 25;
+                        ctx.moveTo(weaponX, this.swordY);
+                        ctx.lineTo(weaponX + this.facing * (150 * (1-swingProg)), this.swordY - 40 * Math.sin(swingProg * Math.PI));
+                    } else { // Static carry
+                        ctx.moveTo(weaponX, this.swordY); ctx.lineTo(weaponX + this.facing * 90, this.swordY + 10);
                     }
-                    ctx.stroke();
-                    ctx.restore();
+                    ctx.stroke(); ctx.restore();
+                } else if (this.type === 'boss') { // Boss's Jagged Red Greatsword
+                    ctx.save(); ctx.strokeStyle = 'red'; ctx.shadowColor = 'red';
+                    ctx.lineWidth = 8; ctx.beginPath();
+                    ctx.moveTo(weaponX, this.swordY);
+                    for (let i = 0; i < 5; i++) {
+                        ctx.lineTo(weaponX + this.facing * (20 + i*25), this.swordY + (i%2?20:0) + 10);
+                    }
+                    ctx.stroke(); ctx.restore();
                 }
                 ctx.restore();
             }
         }
 
-        const p = new Fighter(canvas.width * 0.2, true);
-        const e = new Fighter(canvas.width * 0.8, false);
+        // Initialize characters
+        let p = new Fighter(canvas.width * 0.25, canvas.height - 180, 'lime', 'player');
+        let e = new Fighter(canvas.width * 0.75, canvas.height - 180, 'red', 'boss');
 
-        function move(dir) {
-            if (dir === 'l') { p.vx = -12; p.facing = -1; }
-            if (dir === 'r') { p.vx = 12; p.facing = 1; }
-            if (dir === 'u' && p.y >= canvas.height - 185) p.vy = -18;
-        }
-
-        function hit(t) {
-            if (t === 's' && p.energy < 100) return;
-            p.state = t; p.timer = 20;
-            if (t === 's') { p.energy = 0; shake = 25; checkSpecialHit(); }
-            else { checkHit(); }
-        }
-
-        function checkHit() {
-            let d = Math.abs(p.x - e.x);
-            if (d < 140 && p.state !== 'idle') {
-                e.hp -= 8; p.energy = Math.min(100, p.energy + 15);
-                e.vx = p.facing * 15; e.vy = -8; shake = 8;
-                addParticles(e.x, e.y - e.h/2, '#ff0000');
+        // Combat Mechanics
+        function checkHit(atk, def) {
+            let dist = Math.abs(atk.x - def.x);
+            if (atk.state === 'punch' && dist < 120) {
+                def.hp -= 5; atk.energy = Math.min(100, atk.energy + 10);
+                def.vx = atk.facing * 10; def.vy = -6; shake = 5;
+            } else if (atk.state === 'specialAttack' && dist < 220) {
+                def.hp -= 30; def.vx = atk.facing * 30; def.vy = -12; shake = 20;
             }
         }
 
-        function checkSpecialHit() {
-            let d = Math.abs(p.x - e.x);
-            if (d < 250) { e.hp -= 35; e.vx = p.facing * 35; e.vy = -12; shake = 15; addParticles(e.x, e.y - e.h/2, '#00ffff', 20); }
-        }
-
-        function addParticles(x, y, color = '#00ffff', count = 5) {
-            for (let i = 0; i < count; i++) {
-                particles.push({ x, y, vx: (Math.random()-0.5)*10, vy: (Math.random()-0.5)*10, life: 30, color });
-            }
-        }
-
-        // SPEED FIX: Dushman ko bohot slow kar diya hai
+        // AI Logic
         function enemyAI() {
-            if (e.hp <= 0) { round++; e.hp = 100; e.x = canvas.width * 0.8; e.energy = 0; return; }
+            if (e.hp <= 0 || p.hp <= 0) return;
             let dist = p.x - e.x;
-            
-            // Extreme Controlled Speed: Dushman ab Gujarat nahi chalega
-            e.vx = Math.sign(dist) * (1.5 + round*0.2); // Slow walking speed
-
-            // Attack Logic: Waiting before attack
-            if (Math.abs(dist) < 100 && Math.random() < 0.03 && e.timer === 0) {
-                p.hp -= 6; p.vx = Math.sign(-dist) * 12; p.vy = -5; flash = 10;
-                addParticles(p.x, p.y - p.h/2, '#ff0000', 8);
-                shake = 5;
-            }
+            if (Math.abs(dist) > 180) { e.vx = Math.sign(dist) * 3; e.facing = Math.sign(dist); }
+            else { e.vx = 0; if (Math.random() < 0.03) { e.hp -= 1; shake = 2; } } // Placeholder basic damage
         }
 
-        function draw() {
+        // Game Loop
+        function gameLoop() {
+            // Draw Background with glow effects
             ctx.fillStyle = '#050505'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-            if (flash > 0) { ctx.fillStyle = `rgba(255,0,0,${flash/20})`; ctx.fillRect(0,0,canvas.width,canvas.height); flash--; }
             
             ctx.save();
             if (shake > 0) { ctx.translate((Math.random()-0.5)*shake, (Math.random()-0.5)*shake); shake *= 0.9; }
             
-            // Floor Line: Enhanced look
-            ctx.strokeStyle = '#ffd700'; ctx.lineWidth = 3;
-            ctx.shadowBlur = 10; ctx.shadowColor = '#ffd700';
-            ctx.beginPath(); ctx.moveTo(0, canvas.height-180); ctx.lineTo(canvas.width, canvas.height-180); ctx.stroke();
+            // Draw floor line
+            ctx.strokeStyle = '#ffd700'; ctx.lineWidth = 4; ctx.shadowBlur = 10; ctx.shadowColor = '#ffd700';
+            ctx.beginPath(); ctx.moveTo(0, canvas.height - 180); ctx.lineTo(canvas.width, canvas.height - 180); ctx.stroke();
             ctx.shadowBlur = 0;
-            
+
             p.update(); e.update(); enemyAI();
             p.draw(); e.draw();
-
-            // Particles Update & Draw
-            particles = particles.filter(p => p.life > 0);
-            particles.forEach(p => {
-                p.x += p.vx; p.y += p.vy; p.vy += 0.2; p.life--;
-                ctx.fillStyle = p.color; ctx.globalAlpha = p.life / 30;
-                ctx.fillRect(p.x, p.y, 4, 4);
-                ctx.globalAlpha = 1;
-            });
-            
             ctx.restore();
 
             // UI Update
-            document.getElementById('pHealth').style.width = p.hp + '%';
-            document.getElementById('eHealth').style.width = p.facing === -1 ? p.hp + '%' : p.hp + '%'; // Fixed for visual symmetry if needed
-            document.getElementById('eHealth').style.width = e.hp + '%';
+            document.getElementById('pHealthFill').style.width = p.hp + '%';
+            document.getElementById('eHealthFill').style.width = e.hp + '%';
             document.getElementById('pEnergyFill').style.width = p.energy + '%';
-            document.getElementById('specialBtn').classList.toggle('ready', p.energy === 100);
+            document.getElementById('eHealthFill').style.width = p.hp + '%'; // Symmetrical visual fix if needed
 
-            requestAnimationFrame(draw);
+            requestAnimationFrame(gameLoop);
         }
-        draw();
+        gameLoop();
+
+        // Control Inputs
+        function move(dir) {
+            if (dir === 'u' && p.y >= canvas.height - 185) p.vy = -20;
+            if (dir === 'l') { p.vx = -15; p.facing = -1; }
+            if (dir === 'r') { p.vx = 15; p.facing = 1; }
+        }
+
+        function attack(type) {
+            if (type === 's' && p.energy < 100) return;
+            p.state = type === 'p' ? 'punch' : 'specialAttack';
+            p.stateTimer = type === 'p' ? 15 : 25;
+            if (type === 's') p.energy = 0;
+            checkHit(p, e);
+        }
     </script>
 </body>
 </html>
